@@ -1,0 +1,15 @@
+# Compiled output
+backend/target/
+backend/.mvn/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Local data volumes
+storage/
+postgres_data/
+
+# Node modules (for future frontend builds)
+node_modules/
