@@ -16,6 +16,8 @@ public interface ObjectMetadataRepository extends JpaRepository<ObjectMetadata, 
 
     boolean existsByUserIdAndBucketNameAndFilename(Long userId, String bucketName, String filename);
 
+    boolean existsByUserIdAndBucketName(Long userId, String bucketName);
+
     void deleteByUserIdAndBucketNameAndFilename(Long userId, String bucketName, String filename);
 
 }
