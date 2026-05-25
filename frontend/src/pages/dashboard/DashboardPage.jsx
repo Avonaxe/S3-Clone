@@ -1,38 +1,81 @@
-import { useState } from 'react';
-import { Box, Typography, Button, Grid } from '@mui/material';
+import { useEffect, useState, useCallback } from 'react';
+import { Box, Typography, Button, Grid, CircularProgress, Alert } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import BucketCard from '../../components/common/BucketCard';
 import EmptyState from '../../components/common/EmptyState';
 import CreateBucketModal from '../../components/common/CreateBucketModal';
-
-const INITIAL_BUCKETS = [
-  { name: 'portfolio-assets', objectCount: 42, createdAt: 'May 18, 2026' },
-  { name: 'backup-logs', objectCount: 1_247, createdAt: 'May 15, 2026' },
-  { name: 'qa-bucket', objectCount: 8, createdAt: 'May 10, 2026' },
-];
+import * as bucketService from '../../services/bucketService';
 
 export default function DashboardPage() {
-  const [buckets, setBuckets] = useState(INITIAL_BUCKETS);
+  const [buckets, setBuckets] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
 
-  const handleCreate = (name) => {
-    setBuckets((prev) => [
-      {
-        name,
-        objectCount: 0,
-        createdAt: new Date().toLocaleDateString('en-US', {
+  const fetchBuckets = useCallback(async () => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const response = await bucketService.getBuckets();
+      const mapped = response.data.map((b) => ({
+        name: b.bucketName,
+        createdAt: new Date(b.createdAt).toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'short',
           day: 'numeric',
         }),
-      },
-      ...prev,
-    ]);
+        objectCount: 0,
+      }));
+      setBuckets(mapped);
+    } catch (err) {
+      setError(
+        err.response?.data?.message || 'Failed to load buckets. Please try again.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBuckets();
+  }, [fetchBuckets]);
+
+  const handleCreate = async (name) => {
+    try {
+      await bucketService.createBucket(name);
+      await fetchBuckets();
+    } catch (err) {
+      const message =
+        err.response?.data?.message || 'Failed to create bucket. Please try again.';
+      throw new Error(message);
+    }
   };
 
-  const handleDelete = (name) => {
-    setBuckets((prev) => prev.filter((b) => b.name !== name));
+  const handleDelete = async (name) => {
+    try {
+      await bucketService.deleteBucket(name);
+      setBuckets((prev) => prev.filter((b) => b.name !== name));
+    } catch (err) {
+      setError(
+        err.response?.data?.message || 'Failed to delete bucket. Please try again.'
+      );
+    }
   };
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '60vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box>
@@ -64,6 +107,17 @@ export default function DashboardPage() {
           Create Bucket
         </Button>
       </Box>
+
+      {/* Error Banner */}
+      {error && (
+        <Alert
+          severity="error"
+          sx={{ mb: 3, borderRadius: 2 }}
+          onClose={() => setError('')}
+        >
+          {error}
+        </Alert>
+      )}
 
       {/* Content */}
       {buckets.length === 0 ? (

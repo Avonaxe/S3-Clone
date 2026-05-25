@@ -8,20 +8,23 @@ import {
   Button,
   Typography,
   Box,
+  CircularProgress,
 } from '@mui/material';
 import { CreateNewFolder as CreateNewFolderIcon } from '@mui/icons-material';
 
 export default function CreateBucketModal({ open, onClose, onCreate }) {
   const [bucketName, setBucketName] = useState('');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const handleClose = () => {
     setBucketName('');
     setError('');
+    setSubmitting(false);
     onClose();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const trimmed = bucketName.trim();
     if (!trimmed) {
       setError('Bucket name is required');
@@ -33,8 +36,17 @@ export default function CreateBucketModal({ open, onClose, onCreate }) {
       );
       return;
     }
-    onCreate(trimmed);
-    handleClose();
+
+    setSubmitting(true);
+    setError('');
+    try {
+      await onCreate(trimmed);
+      handleClose();
+    } catch (err) {
+      setError(err.message || 'Failed to create bucket. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -71,17 +83,24 @@ export default function CreateBucketModal({ open, onClose, onCreate }) {
             if (error) setError('');
           }}
           error={!!error}
-          helperText={error || '3–63 characters, lowercase letters, numbers, and hyphens only.'}
+          helperText={
+            error || '3–63 characters, lowercase letters, numbers, and hyphens only.'
+          }
           margin="dense"
+          disabled={submitting}
         />
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2.5, pt: 1 }}>
-        <Button onClick={handleClose} variant="outlined" color="inherit">
+        <Button onClick={handleClose} variant="outlined" color="inherit" disabled={submitting}>
           Cancel
         </Button>
-        <Button onClick={handleSubmit} variant="contained">
-          Create
+        <Button onClick={handleSubmit} variant="contained" disabled={submitting}>
+          {submitting ? (
+            <CircularProgress size={20} color="inherit" />
+          ) : (
+            'Create'
+          )}
         </Button>
       </DialogActions>
     </Dialog>
