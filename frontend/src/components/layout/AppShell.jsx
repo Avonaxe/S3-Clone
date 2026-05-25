@@ -27,22 +27,16 @@ import {
   Logout as LogoutIcon,
   Cloud as CloudIcon,
   Notifications as NotificationsIcon,
-  AccountCircle as AccountCircleIcon,
   Person as PersonIcon,
   ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
+import { useAuth } from '../../contexts/AuthContext';
 
 const DRAWER_WIDTH = 260;
 
 const NAV_ITEMS = [
   { label: 'Buckets', icon: <StorageIcon />, path: '/' },
   { label: 'Settings', icon: <SettingsIcon />, path: '/settings' },
-];
-
-const NOTIFICATIONS = [
-  { id: 1, message: 'Backup-logs sync complete', time: '2 min ago' },
-  { id: 2, message: 'New login from Linux Mint', time: '1 hr ago' },
-  { id: 3, message: 'Bucket portfolio-assets created', time: '3 hr ago' },
 ];
 
 function RouteBreadcrumbs({ pathname }) {
@@ -58,7 +52,13 @@ function RouteBreadcrumbs({ pathname }) {
     <Breadcrumbs
       separator={<ChevronRightIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
       aria-label="breadcrumb"
-      sx={{ px: { xs: 2, md: 3 }, py: 1.5, bgcolor: 'background.paper', borderBottom: '1px solid', borderColor: 'divider' }}
+      sx={{
+        px: { xs: 2, md: 3 },
+        py: 1.5,
+        bgcolor: 'background.paper',
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+      }}
     >
       {crumbs.map((crumb, idx) => {
         const isLast = idx === crumbs.length - 1;
@@ -90,15 +90,15 @@ function RouteBreadcrumbs({ pathname }) {
 export default function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifAnchor, setNotifAnchor] = useState(null);
   const [profileAnchor, setProfileAnchor] = useState(null);
 
+  const username = user?.username || 'User';
+  const avatarInitial = username.charAt(0).toUpperCase();
+
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
 
   const drawerContent = (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -144,7 +144,7 @@ export default function AppShell() {
 
       {/* Footer / Logout */}
       <Box sx={{ p: 2, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-        <ListItemButton onClick={handleLogout}>
+        <ListItemButton onClick={logout}>
           <ListItemIcon sx={{ color: 'inherit', minWidth: 36 }}>
             <LogoutIcon />
           </ListItemIcon>
@@ -189,7 +189,7 @@ export default function AppShell() {
                 color="inherit"
                 onClick={(e) => setNotifAnchor(e.currentTarget)}
               >
-                <Badge badgeContent={NOTIFICATIONS.length} color="error">
+                <Badge badgeContent={0} color="error">
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
@@ -199,7 +199,7 @@ export default function AppShell() {
               open={Boolean(notifAnchor)}
               onClose={() => setNotifAnchor(null)}
               PaperProps={{
-                sx: { width: 320, mt: 1.5, borderRadius: 2, boxShadow: 3 },
+                sx: { width: 280, mt: 1.5, borderRadius: 2, boxShadow: 3 },
               }}
               transformOrigin={{ horizontal: 'right', vertical: 'top' }}
               anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
@@ -209,22 +209,15 @@ export default function AppShell() {
                   Notifications
                 </Typography>
               </Box>
-              {NOTIFICATIONS.map((n) => (
-                <MenuItem key={n.id} onClick={() => setNotifAnchor(null)} sx={{ py: 1.5 }}>
-                  <Box>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      {n.message}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {n.time}
-                    </Typography>
-                  </Box>
-                </MenuItem>
-              ))}
+              <Box sx={{ px: 3, py: 3, textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                  No new alerts.
+                </Typography>
+              </Box>
             </Menu>
 
             {/* Profile */}
-            <Tooltip title="Account">
+            <Tooltip title={username}>
               <IconButton
                 onClick={(e) => setProfileAnchor(e.currentTarget)}
                 size="small"
@@ -238,7 +231,7 @@ export default function AppShell() {
                     fontWeight: 600,
                   }}
                 >
-                  S
+                  {avatarInitial}
                 </Avatar>
               </IconButton>
             </Tooltip>
@@ -278,7 +271,7 @@ export default function AppShell() {
               <MenuItem
                 onClick={() => {
                   setProfileAnchor(null);
-                  handleLogout();
+                  logout();
                 }}
               >
                 <ListItemIcon>

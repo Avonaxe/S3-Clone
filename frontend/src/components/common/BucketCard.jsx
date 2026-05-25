@@ -55,7 +55,7 @@ export default function BucketCard({ bucket, onDelete }) {
       }}
     >
       <CardContent sx={{ p: 3, '&:last-child': { pb: 3 } }}>
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box
               sx={{
@@ -83,9 +83,6 @@ export default function BucketCard({ bucket, onDelete }) {
                 }}
               >
                 {bucket.name}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.25, display: 'block' }}>
-                {bucket.objectCount ?? 0} object{(bucket.objectCount ?? 0) !== 1 ? 's' : ''}
               </Typography>
             </Box>
           </Box>
