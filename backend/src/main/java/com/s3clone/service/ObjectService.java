@@ -1,14 +1,20 @@
 package com.s3clone.service;
 
 import com.s3clone.entity.ObjectMetadata;
+import com.s3clone.exception.FileMissingException;
 import com.s3clone.exception.ResourceNotFoundException;
 import com.s3clone.repository.BucketRepository;
 import com.s3clone.repository.ObjectMetadataRepository;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -67,11 +73,20 @@ public class ObjectService {
                 .orElseThrow(() -> new ResourceNotFoundException("Object not found: " + filename));
     }
 
-    public InputStream getObjectStream(Long userId, String bucketName, String filename) {
-        objectMetadataRepository.findByUserIdAndBucketNameAndFilename(userId, bucketName, filename)
+    public Resource downloadObject(Long userId, String bucketName, String filename) {
+        ObjectMetadata metadata = objectMetadataRepository.findByUserIdAndBucketNameAndFilename(userId, bucketName, filename)
                 .orElseThrow(() -> new ResourceNotFoundException("Object not found: " + filename));
 
-        return storageService.retrieveFile(userId, bucketName, filename);
+        Path filePath = Paths.get(metadata.getFilePath());
+        if (!Files.exists(filePath)) {
+            throw new FileMissingException("Physical file missing from disk: " + filename);
+        }
+
+        try {
+            return new InputStreamResource(Files.newInputStream(filePath));
+        } catch (IOException e) {
+            throw new FileMissingException("Unable to read file from disk: " + filename);
+        }
     }
 
     @Transactional

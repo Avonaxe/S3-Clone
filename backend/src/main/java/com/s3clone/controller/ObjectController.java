@@ -5,7 +5,7 @@ import com.s3clone.entity.ObjectMetadata;
 import com.s3clone.entity.User;
 import com.s3clone.security.CurrentUserUtil;
 import com.s3clone.service.ObjectService;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,15 +52,13 @@ public class ObjectController {
     }
 
     @GetMapping("/{objectName}")
-    public ResponseEntity<InputStreamResource> downloadObject(
+    public ResponseEntity<Resource> downloadObject(
             @PathVariable String bucketName,
             @PathVariable String objectName) {
         User user = currentUserUtil.getCurrentUser();
 
         ObjectMetadata metadata = objectService.getObjectMetadata(user.getId(), bucketName, objectName);
-        InputStream inputStream = objectService.getObjectStream(user.getId(), bucketName, objectName);
-
-        InputStreamResource resource = new InputStreamResource(inputStream);
+        Resource resource = objectService.downloadObject(user.getId(), bucketName, objectName);
 
         MediaType contentType = metadata.getContentType() != null
                 ? MediaType.parseMediaType(metadata.getContentType())

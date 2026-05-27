@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: s3-clone-backend
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/s3clone
+    username: s3user
+    password: s3password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+server:
+  port: 8080
+
+jwt:
+  secret: MySuperSecretKeyForS3CloneMVPWhichMustBeAtLeast32BytesLong!!
+  expiration: 86400000

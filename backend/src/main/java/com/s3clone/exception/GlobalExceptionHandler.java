@@ -20,6 +20,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    @ExceptionHandler(FileMissingException.class)
+    public ResponseEntity<ErrorResponse> handleFileMissing(FileMissingException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
     @ExceptionHandler(ResourceConflictException.class)
     public ResponseEntity<ErrorResponse> handleConflict(ResourceConflictException ex) {
         ErrorResponse error = new ErrorResponse(
