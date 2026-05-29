@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, Grid, CircularProgress, Alert } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import BucketCard from '../../components/common/BucketCard';
@@ -7,6 +8,7 @@ import CreateBucketModal from '../../components/common/CreateBucketModal';
 import * as bucketService from '../../services/bucketService';
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const [buckets, setBuckets] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -24,7 +26,6 @@ export default function DashboardPage() {
           month: 'short',
           day: 'numeric',
         }),
-        objectCount: 0,
       }));
       setBuckets(mapped);
     } catch (err) {
@@ -126,7 +127,11 @@ export default function DashboardPage() {
         <Grid container spacing={3}>
           {buckets.map((bucket) => (
             <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={bucket.name}>
-              <BucketCard bucket={bucket} onDelete={handleDelete} />
+              <BucketCard
+                bucket={bucket}
+                onDelete={handleDelete}
+                onNavigate={(name) => navigate(`/buckets/${name}`)}
+              />
             </Grid>
           ))}
         </Grid>

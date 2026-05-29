@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AppShell from './components/layout/AppShell';
 import LoginPage from './pages/auth/LoginPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
+import BucketDetailsPage from './pages/dashboard/BucketDetailsPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import SettingsPage from './pages/settings/SettingsPage';
 
@@ -13,7 +14,7 @@ function PrivateRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return null; // or a full-screen loader
+    return null;
   }
 
   return isAuthenticated ? children : <Navigate to="/login" replace />;
@@ -36,6 +37,7 @@ function App() {
               }
             >
               <Route index element={<DashboardPage />} />
+              <Route path="buckets/:bucketName" element={<BucketDetailsPage />} />
               <Route path="profile" element={<ProfilePage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>

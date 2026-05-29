@@ -12,7 +12,7 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 
-export default function BucketCard({ bucket, onDelete }) {
+export default function BucketCard({ bucket, onDelete, onNavigate }) {
   const [elevation, setElevation] = useState(1);
 
   const handleDelete = async (e) => {
@@ -26,6 +26,7 @@ export default function BucketCard({ bucket, onDelete }) {
 
   return (
     <Card
+      onClick={() => onNavigate?.(bucket.name)}
       onMouseEnter={() => setElevation(4)}
       onMouseLeave={() => setElevation(1)}
       elevation={elevation}
