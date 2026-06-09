@@ -8,9 +8,9 @@ spring:
       max-request-size: 5MB
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/s3clone
-    username: s3user
-    password: s3password
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/s3clone}
+    username: ${SPRING_DATASOURCE_USERNAME:s3user}
+    password: ${SPRING_DATASOURCE_PASSWORD:s3password}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -22,5 +22,5 @@ server:
   port: 8080
 
 jwt:
-  secret: MySuperSecretKeyForS3CloneMVPWhichMustBeAtLeast32BytesLong!!
+  secret: ${JWT_SECRET:MySuperSecretKeyForS3CloneMVPWhichMustBeAtLeast32BytesLong!!}
   expiration: 86400000
