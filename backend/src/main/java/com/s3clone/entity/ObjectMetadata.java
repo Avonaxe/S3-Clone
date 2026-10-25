@@ -18,9 +18,6 @@ public class ObjectMetadata {
     @Column(name = "bucket_name", nullable = false)
     private String bucketName;
 
-    @Column(name = "file_path", nullable = false)
-    private String filePath;
-
     @Column(nullable = false)
     private String filename;
 
@@ -62,14 +59,6 @@ public class ObjectMetadata {
 
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
     }
 
     public String getFilename() {

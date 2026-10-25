@@ -8,11 +8,7 @@ import com.s3clone.repository.BucketRepository;
 import com.s3clone.repository.ObjectMetadataRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.FileSystemUtils;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -20,11 +16,14 @@ public class BucketService {
 
     private final BucketRepository bucketRepository;
     private final ObjectMetadataRepository objectMetadataRepository;
+    private final ObjectService objectService;
 
     public BucketService(BucketRepository bucketRepository,
-                         ObjectMetadataRepository objectMetadataRepository) {
+                         ObjectMetadataRepository objectMetadataRepository,
+                         ObjectService objectService) {
         this.bucketRepository = bucketRepository;
         this.objectMetadataRepository = objectMetadataRepository;
+        this.objectService = objectService;
     }
 
     public Bucket createBucket(Long userId, String bucketName) {
@@ -53,16 +52,11 @@ public class BucketService {
             objectMetadataRepository.deleteAll(objects);
         }
 
-        // Step 2: Delete the physical directory
-        Path bucketPath = Paths.get("storage", userId.toString(), bucketName);
+        // Step 2: Delete the stored objects from S3
         try {
-            if (Files.exists(bucketPath)) {
-                FileSystemUtils.deleteRecursively(bucketPath);
-            } else {
-                System.out.println("[BucketService] Physical directory not found for bucket: " + bucketName + ", skipping filesystem cleanup.");
-            }
+            objectService.deleteAllInBucket(userId, bucketName);
         } catch (Exception e) {
-            System.out.println("[BucketService] Warning: Failed to delete physical directory for bucket: " + bucketName + " — " + e.getMessage());
+            System.out.println("[BucketService] Warning: Failed to delete stored objects for bucket: " + bucketName + " — " + e.getMessage());
         }
 
         // Step 3: Delete the bucket record

@@ -10,7 +10,6 @@ public class ObjectMetadataResponse {
     private String contentType;
     private Long sizeBytes;
     private LocalDateTime uploadTime;
-    private String filePath;
 
     public Long getId() {
         return id;
@@ -58,14 +57,6 @@ public class ObjectMetadataResponse {
 
     public void setUploadTime(LocalDateTime uploadTime) {
         this.uploadTime = uploadTime;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
     }
 
 }

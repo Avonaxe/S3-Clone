@@ -112,9 +112,7 @@ public class ObjectController {
     }
 
     private ObjectMetadataResponse mapToFullResponse(ObjectMetadata metadata) {
-        ObjectMetadataResponse r = mapToUploadResponse(metadata);
-        r.setFilePath(metadata.getFilePath());
-        return r;
+        return mapToUploadResponse(metadata);
     }
 
 }

@@ -24,3 +24,10 @@ server:
 jwt:
   secret: ${JWT_SECRET:MySuperSecretKeyForS3CloneMVPWhichMustBeAtLeast32BytesLong!!}
   expiration: 86400000
+
+aws:
+  access-key-id: ${AWS_ACCESS_KEY_ID}
+  secret-key: ${AWS_SECRET_ACCESS_KEY}
+  region: ${AWS_REGION}
+  s3:
+    master-bucket: ${AWS_MASTER_BUCKET}
