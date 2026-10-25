@@ -2,6 +2,8 @@
 backend/target/
 backend/.mvn/
 
+backend/.env
+
 # IDE
 .idea/
 *.iml

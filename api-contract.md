@@ -240,8 +240,7 @@ Fetch full metadata for a single object without downloading its contents.
     "filename": "string",
     "contentType": "string",
     "sizeBytes": 12345,
-    "uploadTime": "2024-01-01T00:00:00Z",
-    "filePath": "storage/{userId}/{bucketName}/{filename}"
+    "uploadTime": "2024-01-01T00:00:00Z"
   }
   ```
 - **Error Responses:**
@@ -256,4 +255,4 @@ While this document specifies only the API surface, the following resources are 
 
 - **User:** `id`, `username`, `passwordHash`, `createdAt`
 - **Bucket:** `id`, `userId`, `bucketName`, `createdAt`
-- **ObjectMetadata:** `id`, `userId`, `bucketName`, `filename`, `filePath`, `contentType`, `sizeBytes`, `uploadTime`
+- **ObjectMetadata:** `id`, `userId`, `bucketName`, `filename`, `contentType`, `sizeBytes`, `uploadTime`

@@ -27,10 +27,12 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/s3clone
       SPRING_DATASOURCE_USERNAME: s3user
       SPRING_DATASOURCE_PASSWORD: s3password
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+      AWS_MASTER_BUCKET: ${AWS_MASTER_BUCKET}
     ports:
       - "8080:8080"
-    volumes:
-      - ./storage:/app/storage
     depends_on:
       postgres:
         condition: service_healthy

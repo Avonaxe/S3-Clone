@@ -26,6 +26,9 @@ import {
 } from '@mui/icons-material';
 import * as objectService from '../../services/objectService';
 
+// Matches spring.servlet.multipart.max-file-size on the backend
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+
 function formatBytes(bytes) {
   if (bytes === 0) return '0 B';
   const k = 1024;
@@ -63,6 +66,10 @@ export default function BucketDetailsPage() {
 
   const handleUpload = async (file) => {
     if (!file) return;
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setError(`File is too large. Maximum size is ${formatBytes(MAX_UPLOAD_BYTES)}.`);
+      return;
+    }
     setUploading(true);
     setError('');
     try {
@@ -100,7 +107,7 @@ export default function BucketDetailsPage() {
   const handleDownload = async (objectName) => {
     try {
       const res = await objectService.downloadFile(bucketName, objectName);
-      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const url = window.URL.createObjectURL(res.data);
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', objectName);
@@ -109,7 +116,14 @@ export default function BucketDetailsPage() {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      setError(err.response?.data?.message || 'Download failed.');
+      // With responseType 'blob', the JSON error body arrives as a Blob
+      let message;
+      try {
+        message = JSON.parse(await err.response.data.text()).message;
+      } catch {
+        message = undefined;
+      }
+      setError(message || 'Download failed.');
     }
   };
 
